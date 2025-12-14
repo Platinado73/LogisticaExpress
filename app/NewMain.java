@@ -1,6 +1,7 @@
 package app;
 
 import Algoritmo.*;
+import io.LeitorDados;
 import java.util.*;
 import model.*;
 import util.MedidorDesempenho;
@@ -19,7 +20,7 @@ public class NewMain {
             int[] capacidade = new int[1];
 
 // Leitura dos dados
-            List<Pacote> pacotes = LeitorDeDados.lerPacotes("delivery_data.txt", capacidade);
+            List<Pacote> pacotes = LeitorDados.lerPacotes("delivery_data.txt", capacidade);
 
             long memoriaAntes = MedidorDesempenho.memoriaUsada();
 
@@ -52,4 +53,4 @@ public class NewMain {
     }
 }
 
-}
+
