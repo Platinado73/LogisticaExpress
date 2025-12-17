@@ -16,9 +16,7 @@ public class MedidorDesempenho {
 
 // Mede a memória usada pela JVM
     public static long memoriaUsada() {
-        Runtime runtime = Runtime.getRuntime();
-        runtime.gc();
-        return runtime.totalMemory() - runtime.freeMemory();
+        Runtime rt = Runtime.getRuntime();
+        return (rt.totalMemory() - rt.freeMemory()) / (1024 * 1024);
     }
-
 }

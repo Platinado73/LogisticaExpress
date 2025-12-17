@@ -1,56 +1,53 @@
 package app;
 
-import Algoritmo.*;
 import io.LeitorDados;
-import java.util.*;
-import model.*;
+import java.util.List;
+import model.Pacote;
+import service.OtimizadorDeCarga;
 import util.MedidorDesempenho;
 
-/**
- *
- * @author PLATINADO
- */
 public class NewMain {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
-        try {
-            int[] capacidade = new int[1];
 
-// Leitura dos dados
-            List<Pacote> pacotes = LeitorDados.lerPacotes("delivery_data.txt", capacidade);
+        long inicio = System.nanoTime();
 
-            long memoriaAntes = MedidorDesempenho.memoriaUsada();
+        // capacidade será lida do ficheiro
+        int[] capacidade = new int[1];
 
-            final ResultadoMochila[] resultado = new ResultadoMochila[1];
+        // leitura correta (capacidade + pacotes)
+        List<Pacote> pacotes = LeitorDados.lerPacotes("delivery_data.txt", capacidade);
 
-            long tempo = MedidorDesempenho.medirTempo(() -> {
-                resultado[0] = AlgoritmoMochila.resolver(pacotes, capacidade[0]);
-            });
+        List<Pacote> selecionados
+                = OtimizadorDeCarga.otimizar(pacotes, capacidade[0]);
 
-            long memoriaDepois = MedidorDesempenho.memoriaUsada();
+        int pesoTotal = 0;
+        int valorTotal = 0;
 
-// Apresentação dos resultados
-            System.out.println("\n\t===== LOGÍSTICA EXPRESS =====\n\t");
-            System.out.println("Capacidade máxima: " + capacidade[0] + " kg");
-            System.out.println("Valor total obtido: " + resultado[0].getValorTotal());
-            System.out.println("Peso total utilizado: " + resultado[0].getPesoTotal() + " kg");
+        for (Pacote p : selecionados) {
+            pesoTotal += p.getPeso();
+            valorTotal += p.getValor();
+        }
 
-            System.out.println("\n\tPacotes selecionados:\n\t");
-            for (Pacote p : resultado[0].getPacotes()) {
-                System.out.println("ID " + p.getId() + " | Peso: " + p.getPeso() + " | Valor: " + p.getValor());
-            }
+        System.out.println("\n\t===== LOGÍSTICA EXPRESS =====\n");
+        System.out.println("Capacidade máxima: " + capacidade[0] + " kg");
+        System.out.println("Pacotes selecionados: " + selecionados.size());
+        System.out.println("Peso total utilizado: " + pesoTotal + " kg");
+        System.out.println("Valor total obtido: " + valorTotal);
 
-            System.out.println("\n\tTempo de execução: " + tempo / 1_000_000 + " ms");
-            System.out.println("Memória utilizada: " + (memoriaDepois - memoriaAntes) / (1024 * 1024) + " MB");
-            System.out.println("============================");
+        double pesoMedio = (double) pesoTotal / selecionados.size();
+        double valorMedio = (double) valorTotal / selecionados.size();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        System.out.printf("Peso médio por pacote: %.2f kg%n", pesoMedio);
+        System.out.printf("Valor médio por pacote: %.2f%n", valorMedio);
+
+        System.out.println("\n--- LISTA DE PACOTES ---");
+
+        for (Pacote p : selecionados) {
+            System.out.printf(
+                    "ID: %-4d | Peso: %3d | Valor: %4d%n",
+                    p.getId(), p.getPeso(), p.getValor()
+            );
         }
     }
 }
-
-
